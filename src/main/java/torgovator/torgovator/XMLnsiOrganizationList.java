@@ -21,11 +21,6 @@ public class XMLnsiOrganizationList {
 	private Document document;
 	public List<Organization> OrgList = new ArrayList<>();
 
-	private Boolean orginlist(Organization org) {
-
-		return false;
-	}
-
 	public XMLnsiOrganizationList(String filaname) throws ParserConfigurationException, SAXException, IOException {
 		try {
 			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
