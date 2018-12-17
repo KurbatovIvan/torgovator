@@ -11,10 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.ini4j.InvalidFileFormatException;
 import org.xml.sax.SAXException;
 
-import torgovator.torgovator.Database;
-import torgovator.torgovator.Params;
-import torgovator.torgovator.XMLnsiOrganizationList;
-import torgovator.torgovator.XmlDocumentZakupka;
 import torgovator.utils.Downloader;
 import torgovator.utils.EMailService;
 import torgovator.utils.ExceptionUtils;
@@ -92,12 +88,13 @@ public class App {
 				+ "zk.enddate AS \"Дата и время окончания подачи заявок\",\r\n"
 				+ "zk.maxprice AS \"Начальная (максимальная) цена контракта\",\r\n"
 				+ "zk.responsibleorg_fullname  AS \"Размещение осуществляет\",\r\n"
-				+ "SUBSTRING (cust.purchasecode from 4 for 10) \"ИНН Заказчика\" \r\n"
+				+ "SUBSTRING (cust.purchasecode from 4 for 10) \"ИНН Заказчика\", \r\n"
+				+ "org.fullname  AS \"Полное наименование Заказчика\",\r\n" + "org.phone  AS \"Телефон\"\r\n"
 				+ "/*,cast (SUBSTRING (zk.purchasecode from 4 for 10) as NUMERIC)*/\r\n" + "from\r\n" + "zakupki zk\r\n"
 				+ "inner join customerrequirements cust on (zk.id=cust.recordindex)\r\n"
-				+ "inner join purchaseobjects po on (zk.id=po.recordindex)\r\n" + "\r\n" + "where\r\n"
-				+ "(SUBSTRING (cust.purchasecode from 4 for 10) in (\r\n" + "select mo.inn\r\n" + "from my_org mo\r\n"
-				+ ") or (zk.inn in\r\n" + "(select mo.inn from my_org mo) ))\r\n" + "\r\n"
+				+ "inner join purchaseobjects po on (zk.id=po.recordindex) left join organization org on (SUBSTRING (cust.purchasecode from 4 for 10)=org.inn and org.actual=1 and org.phone is not null)\r\n"
+				+ "\r\n" + "where\r\n" + "(SUBSTRING (cust.purchasecode from 4 for 10) in (\r\n" + "select mo.inn\r\n"
+				+ "from my_org mo\r\n" + ") or (zk.inn in\r\n" + "(select mo.inn from my_org mo) ))\r\n" + "\r\n"
 				+ "and zk.enddate>=current_timestamp\r\n" + "\r\n" + "       \r\n" + "and\r\n" + "(\r\n"
 				+ "(po.okpd2_code like '58%')\r\n" + "or\r\n" + "(po.okpd2_code like '62%')\r\n" + "or\r\n"
 				+ "(po.okpd2_code like '63%')\r\n" + ")\r\n" /*
