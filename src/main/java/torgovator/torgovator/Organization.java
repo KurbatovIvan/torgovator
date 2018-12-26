@@ -5,6 +5,7 @@ public class Organization extends Document {
 	private String KPP = "";
 	private String OGRN = "";
 	private String OKTMO = "";
+	private String IKU = "";
 	private String fullName = "";
 	private String shortName = "";
 	private String regNumber = "";
@@ -300,6 +301,17 @@ public class Organization extends Document {
 	 *            the contactPerson to set */
 	public void setContactPerson(String contactPerson) {
 		this.contactPerson = contactPerson;
+	}
+
+	/** @return the IKU */
+	public String getIKU() {
+		return IKU;
+	}
+
+	/** @param IKU
+	 *            the IKU to set */
+	public void setIKU(String iKu) {
+		IKU = iKu;
 	}
 
 }

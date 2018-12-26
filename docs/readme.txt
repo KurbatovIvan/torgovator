@@ -1,3 +1,7 @@
+223 ФЗ Качать вот тут:
+ftp://fz223free:@ftp.zakupki.gov.ru/out/published/Irkutskaya_obl/purchaseNotice/daily/
+
+
 NotificationEF - fcsNotificationEA44*
 
 fcsNotificationEP

@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import torgovator.utils.ExceptionUtils;
 
 public abstract class Document {
-	private static Logger log = Logger.getLogger(App.class.getName());
+	public static Logger log = Logger.getLogger(App.class.getName());
 
 	private long Id;
 	private String FileName = "";

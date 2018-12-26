@@ -22,6 +22,7 @@ public class Params {
 	private static WorkDir WorkDirTorgi;
 
 	private static String DatabaseFDB = "";
+	private static String DatabaseFDB_Plan = "";
 
 	private static String DatabaseUser = "";
 	private static String DatabasePasswd = "";
@@ -52,6 +53,7 @@ public class Params {
 			setFtpUserName(prefs.node(progname).get("FtpUserName", null));
 			setFtpUserPasswd(prefs.node(progname).get("FtpUserPasswd", null));
 			setDatabaseFDB(prefs.node(progname).get("DatabaseFDB", null));
+			setDatabaseFDB_Plan(prefs.node(progname).get("DatabaseFDB_Plan", null));
 			setPatternToExtractRegexp(prefs.node(progname).get("PatternToExtractRegexp", null));
 			setMailhost(prefs.node(progname).get("Mailhost", null));
 			setMailfrom(prefs.node(progname).get("Mailfrom", null));
@@ -386,6 +388,17 @@ public class Params {
 	 *            the sendemail to set */
 	public static void setSendemail(boolean sendemail) {
 		Params.sendemail = sendemail;
+	}
+
+	/** @return the databaseFDB_Plan */
+	public static String getDatabaseFDB_Plan() {
+		return DatabaseFDB_Plan;
+	}
+
+	/** @param databaseFDB_Plan
+	 *            the databaseFDB_Plan to set */
+	public static void setDatabaseFDB_Plan(String databaseFDB_Plan) {
+		DatabaseFDB_Plan = databaseFDB_Plan;
 	}
 
 }

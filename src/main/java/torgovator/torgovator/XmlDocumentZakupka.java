@@ -41,6 +41,12 @@ public class XmlDocumentZakupka {
 		if (zakupka.getOKPD2().size() == 0) {
 			zakupka.setOKPD2((ReturnArrayValues(resultOfParse, "KTRU_code")));
 		}
+		/*
+		 * for (int i = 0; i < zakupka.getOKPD2().size(); i++) { String OKPD2Str =
+		 * zakupka.getOKPD2().get(i); System.out.println(OKPD2Str); if
+		 * (OKPD2Str.length() > 12) { OKPD2Str = OKPD2Str.substring(0, 12);
+		 * System.out.println(OKPD2Str); } }
+		 */
 
 		zakupka.setPurchaseObjectInfo(ReturnValues(resultOfParse, "purchaseObjectInfo"));
 		zakupka.setINN(ReturnValues(resultOfParse, "responsibleOrg_INN"));

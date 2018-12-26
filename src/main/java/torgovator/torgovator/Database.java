@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -211,7 +212,7 @@ public class Database {
 				String OKPD2Str = OKPD2.get(i);
 				statement.setLong(1, zakupka.getId());
 				if (OKPD2Str.length() > 12) {
-					OKPD2Str = OKPD2Str.substring(1, 12);
+					OKPD2Str = OKPD2Str.substring(0, 12);
 				}
 				statement.setString(2, OKPD2Str);
 
@@ -258,15 +259,15 @@ public class Database {
 	 * @return - возвращает строки со столбцами из СтатикСета
 	 * @throws SQLException
 	 */
-	public String getDatasetString(String strSQL) throws SQLException {
+	public String getDatasetString(String strSQL) {
 		//        Statement.KEEP_CURRENT_RESULT;
 		String messageResult = "";
 		ResultSet rs = getDataset(strSQL);
-		System.out.println("Дата сет закрыт1: " + rs.isClosed());
-		ResultSetMetaData rsmd = rs.getMetaData();
-		int nColumnsCount;
 
 		try {
+			System.out.println("Дата сет закрыт1: " + rs.isClosed());
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int nColumnsCount;
 			nColumnsCount = rs.getMetaData().getColumnCount();
 			while (rs.next()) {
 
@@ -274,6 +275,15 @@ public class Database {
 					Object obj = rs.getObject(n);
 					if (obj != null) {
 						String ColumnName = rsmd.getColumnLabel(n);
+
+						if (rsmd.getColumnType(n) == 8) {
+							Formatter f = new Formatter(); // объявление объекта
+							f.format("%.2f ", obj);
+							String result = f.toString();
+							result = result.replace(',', '.'); // Заменяем запятую на точку для JS
+							obj = result;
+						}
+
 						obj = HtmlURL(obj.toString());
 						messageResult = messageResult + (ColumnName + ": " + obj + "\r\n <br>");
 					}
@@ -337,28 +347,10 @@ public class Database {
 		return rs;
 	}
 
-	public ResultSet getDatasetDetail(String strSQL) {
-
-		ResultSet rsDetail = null;
-		// Создаём класс, с помощью которого будут выполняться
-		// SQL запросы.
-		try {
-			Statement stmtDetail = conn.createStatement();
-			System.out.println("База данных открыта: " + conn.isClosed());
-			// Выполняем SQL запрос.
-			rsDetail = stmtDetail.executeQuery(strSQL);
-
-		} catch (SQLException e) {
-			log.warning("SQL: " + strSQL);
-			log.warning(ExceptionUtils.ExceptionStackToString(e));
-		}
-		return rsDetail;
-	}
-
-	public Database() {
+	public Database(String strDatabasePath) {
 
 		//		String strDatabasePath = "D:\\!Work\\torgovator\\Database\\TORGOVATOR.FDB";
-		String strDatabasePath = Params.getDatabaseFDB();
+		//		String strDatabasePath = Params.getDatabaseFDB();
 		log.info("Path to Database " + strDatabasePath);
 		Properties props = new Properties();
 
