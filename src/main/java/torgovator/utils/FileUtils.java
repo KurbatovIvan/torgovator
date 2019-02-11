@@ -1,7 +1,11 @@
 package torgovator.utils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import torgovator.torgovator.App;
 import torgovator.torgovator.WorkDir;
@@ -73,4 +77,26 @@ public class FileUtils {
 		}
 
 	}
+
+	public static String readFile(String filePath) {
+		StringBuilder stringBuilder = new StringBuilder();
+		String ls = System.getProperty("line.separator");
+		try {
+
+			try (Stream<String> lines = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
+				for (String line : (Iterable<String>) lines::iterator) {
+
+					stringBuilder.append(line);
+					stringBuilder.append(ls);
+
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.warning(ExceptionUtils.ExceptionStackToString(e));
+		}
+		return stringBuilder.toString();
+	}
+
 }

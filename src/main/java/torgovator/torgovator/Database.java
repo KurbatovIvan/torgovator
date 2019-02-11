@@ -375,6 +375,9 @@ public class Database {
 		try {
 			// Создаём подключение к базе данных
 			// conn = DriverManager.getConnection(strURL, strUser, strPassword);
+			if (strDatabasePath.isEmpty()) {
+				throw new SQLException("Не указан путь к БД");
+			}
 			conn = DriverManager.getConnection(strURL, props);
 
 			if (conn == null) {

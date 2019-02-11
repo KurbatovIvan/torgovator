@@ -66,6 +66,31 @@
     </execution>
   </executions>
 </plugin>
+
+ <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/htm</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/htm</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+
 </plugins>
     <defaultGoal>install</defaultGoal>
   </build>
