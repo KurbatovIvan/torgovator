@@ -2,6 +2,7 @@ package torgovator.torgovator;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -68,39 +69,56 @@ public class App {
 
 		}
 
+		// Очищаю папки		
 		FileUtils.RemoveAllFileinDirTo(Params.getWorkDirTorgi());
-
-		// Очищаю папку 
 		FileUtils.clear_directory(Params.getWorkDirTorgi());
 
-		// Вот тут приделать отправку писем			
+		SendEmail();
+
+	};
+
+	private static void SendEmail() {
+		// Вот тут приделать отправку писем
+		Database data = new Database(Params.getDatabaseFDB());
 		String Mailhost = Params.getMailhost();
 		String Mailpasswd = Params.getMailpasswd();
 		String Mailfrom = Params.getMailfrom();
-		String Mailto = Params.getMailto();
+		//String Mailto = Params.getMailto();
+		String Mailto = "";
+		String USERID = "";
 		String MailUsername = Params.getMailUsername();
 		String MailMsg = "";
 		String MailSubject = "Вероятно наши торги. Уведомление о событиях в закупках";
 
-		MailMsg = getEmailString(data);
-		if (MailMsg != "") {
-			//			MailMsg = "Нет торгов по нашим клиентам и по нашим услугам";
+		ResultSet users = data.getDatasetUsers();
 
-			MailMsg = MailMsg + "\r\n Ваш любимый торговый робот";
-			if (Params.isSendemail()) {
-				EMailService.SendEMail(Mailhost, MailUsername, Mailpasswd, Mailfrom, Mailto, MailMsg, MailSubject);
-			}
-		} else {
-			log.info("Письмо не шлем, ибо нечего слать");
+		try {
+			if (users.next())
+				do {
+					Mailto = users.getString(users.findColumn("EMAIL"));
+					USERID = users.getString(users.findColumn("USERID"));
+					MailMsg = getEmailString(USERID);
+					if (MailMsg != "") {
+						MailMsg = MailMsg + "\r\n Ваш любимый торговый робот";
+						if (Params.isSendemail()) {
+							EMailService.SendEMail(Mailhost, MailUsername, Mailpasswd, Mailfrom, Mailto, MailMsg,
+									MailSubject);
+						}
+					} else {
+						log.info("Письмо не шлем, ибо нечего слать");
+					}
+				} while (users.next());
+		} catch (SQLException e) {
+			log.warning(ExceptionUtils.ExceptionStackToString(e));
 		}
 
-	};
+	}
 
-	private static String getEmailString(Database data) {
+	private static String getEmailString(String USERID) {
+		Database data = new Database(Params.getDatabaseFDB());
 		String head = FileUtils.readFile("htm/head.htm");
 		String logo = FileUtils.readFile("htm/logo.htm");
-
-		String msg = data.getDatasetString("select distinct " + "zk.placingway AS \"Способ размещения\",\r\n"
+		String SelectQuery = "select distinct " + "zk.placingway AS \"Способ размещения\",\r\n"
 				+ "cust.purchasecode AS \"Идентификационный код закупки (ИКЗ)\",\r\n"
 				+ "zk.href AS \"Ссылка на закупку\",\r\n"
 				+ "zk.purchaseobjectinfo AS \"Наименование объекта закупки\",\r\n"
@@ -113,15 +131,12 @@ public class App {
 				+ "/*,cast (SUBSTRING (zk.purchasecode from 4 for 10) as NUMERIC)*/\r\n" + "from\r\n" + "zakupki zk\r\n"
 				+ "inner join customerrequirements cust on (zk.id=cust.recordindex)\r\n"
 				+ "inner join purchaseobjects po on (zk.id=po.recordindex) left join organization org on (SUBSTRING (cust.purchasecode from 4 for 10)=org.inn and org.actual=1 and org.phone is not null)\r\n"
-				+ "\r\n" + "where\r\n" + "(SUBSTRING (cust.purchasecode from 4 for 10) in (\r\n" + "select mo.inn\r\n"
-				+ "from my_org mo\r\n" + ") or (zk.inn in\r\n" + "(select mo.inn from my_org mo) ))\r\n" + "\r\n"
-				+ "and zk.enddate>=current_timestamp\r\n" + "and (zk.startdate>current_timestamp-1.5)" + "       \r\n"
-				+ "and\r\n" + "(\r\n" + "(po.okpd2_code like '58%')\r\n" + "or\r\n" + "(po.okpd2_code like '62%')\r\n"
-				+ "or\r\n" + "(po.okpd2_code like '63%')\r\n" + ")\r\n" /*
-																		 * + "and\r\n" + "zk.id in\r\n" +
-																		 * "(select max(zz.id) from zakupki zz group by zz.purchasenumber)\r\n"
-																		 * + "\r\n" + "\r\n" + "order by zk.startdate"
-																		 */);
+				+ " where (SUBSTRING (cust.purchasecode from 4 for 10) in ( select mo.inn from my_org mo where mo.userid='@GoogleID') "
+				+ " or (zk.inn in (select mo.inn from my_org mo where mo.userid='@GoogleID') )) and zk.enddate>=current_timestamp "
+				+ " and (zk.startdate>current_timestamp-1.5)  and  ((po.okpd2_code like '58%')\r\n" + "or\r\n"
+				+ "(po.okpd2_code like '62%')\r\n" + " or\r\n" + "(po.okpd2_code like '63%'))";
+		SelectQuery = SelectQuery.replace("@GoogleID", USERID);
+		String msg = data.getDatasetString(SelectQuery);
 
 		if (msg != "") {
 

@@ -320,6 +320,12 @@ public class Database {
 		}
 	}
 
+	public ResultSet getDatasetUsers() {
+		ResultSet rs = null;
+		rs = getDataset("select USERID, EMAIL from USERS");
+		return rs;
+	}
+
 	/** @param SQL
 	 *            Запрос по которому нужно вернуть статиксет
 	 * @return ResultSet */
