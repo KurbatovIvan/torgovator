@@ -4,22 +4,23 @@ import java.util.Date;
 import java.util.List;
 
 public class Zakupka extends Document {
-	private List<String> PURCHASECODE1;
+	//	private List<String> CUSTOMERREQUIREMENTS;
+	private List<customerRequirement> CUSTOMERREQUIREMENTS;
 	private List<String> OKPD2;
 	private String purchaseNumber = "";
 	private String OKPD2_name = "";
+	private String CUSTOMERREGNUM = "";
 	private String INN = "";
 	private String responsibleOrg_fullName = "";
 	private String placingWay = "";
-	private String Regnum = "";
 	private String purchaseObjectInfo = "";
-	// private String PURCHASECODE = "";
 	private String href = "";
+	private Integer zakon;
 	private java.sql.Timestamp PublishDate;
 	private java.sql.Timestamp endDate;
 	private java.sql.Timestamp startDate;
 	private double maxPrice = 0;
-
+	private Boolean emptyZakupka = false;
 	/*
 	 * TODO Напилить модификации закупок ТЕГ modification
 	 */
@@ -33,6 +34,10 @@ public class Zakupka extends Document {
 	/** @param purchaseNumber
 	 *            the purchaseNumber to set */
 	public void setPurchaseNumber(String purchaseNumber) {
+		if (purchaseNumber.contains(",")) {
+			purchaseNumber = purchaseNumber.substring(0, purchaseNumber.indexOf(","));
+
+		}
 		this.purchaseNumber = purchaseNumber;
 	}
 
@@ -58,17 +63,6 @@ public class Zakupka extends Document {
 		INN = iNN;
 	}
 
-	/** @return the regnum */
-	public String getRegnum() {
-		return Regnum;
-	}
-
-	/** @param regnum
-	 *            the regnum to set */
-	public void setRegnum(String regnum) {
-		Regnum = regnum;
-	}
-
 	/** @return the purchaseObjectInfo */
 	public String getPurchaseObjectInfo() {
 		return purchaseObjectInfo;
@@ -91,15 +85,15 @@ public class Zakupka extends Document {
 		this.href = href;
 	}
 
-	/** @return the pURCHASECODE1 */
-	public List<String> getPURCHASECODE1() {
-		return PURCHASECODE1;
+	/** @return the customerRequirement */
+	public List<customerRequirement> getCUSTOMERREQUIREMENTS() {
+		return CUSTOMERREQUIREMENTS;
 	}
 
 	/** @param pURCHASECODE1
 	 *            the pURCHASECODE1 to set */
-	public void setPURCHASECODE1(List<String> pURCHASECODE1) {
-		PURCHASECODE1 = pURCHASECODE1;
+	public void setCUSTOMERREQUIREMENTS(List<customerRequirement> pURCHASECODE1) {
+		CUSTOMERREQUIREMENTS = pURCHASECODE1;
 	}
 
 	/** @return the oKPD2 */
@@ -200,6 +194,39 @@ public class Zakupka extends Document {
 		if (returnValues != "") {
 			setPublishDate(StrToDateSql(returnValues));
 		}
+	}
+
+	/** @return the zakon */
+	public Integer getZakon() {
+		return zakon;
+	}
+
+	/** @param zakon
+	 *            the zakon to set */
+	public void setZakon(Integer zakon) {
+		this.zakon = zakon;
+	}
+
+	/** @return the emptyZakupka */
+	public Boolean getEmptyZakupka() {
+		return emptyZakupka;
+	}
+
+	/** @param emptyZakupka
+	 *            the emptyZakupka to set */
+	public void setEmptyZakupka(Boolean emptyZakupka) {
+		this.emptyZakupka = emptyZakupka;
+	}
+
+	/** @return the cUSTOMERREGNUM */
+	public String getCUSTOMERREGNUM() {
+		return CUSTOMERREGNUM;
+	}
+
+	/** @param cUSTOMERREGNUM
+	 *            the cUSTOMERREGNUM to set */
+	public void setCUSTOMERREGNUM(String cUSTOMERREGNUM) {
+		CUSTOMERREGNUM = cUSTOMERREGNUM;
 	}
 
 }

@@ -20,49 +20,14 @@ public class Database {
 
 	protected Connection conn = null;
 
-	private boolean OrgExist(String regnumber) {
-		if (regnumber.isEmpty()) {
-			return true;
-		}
-		;
-		String strSQL = "select count(*) as countorg from ORGANIZATION org where org.regnumber='";
-		strSQL = strSQL + regnumber + "';";
-		ResultSet rs = getDataset(strSQL);
-		try {
-			int countorg = 0;
-			while (rs.next()) {
-				countorg = rs.getInt(1);
-			}
-			if (countorg >= 1) {
-				return true;
-			} else {
-				return false;
-			}
-
-		} catch (SQLException e) {
-			System.err.println(e.getLocalizedMessage());
-			e.printStackTrace();
-			log.warning(e.getLocalizedMessage() + "\r\n" + strSQL);
-			log.warning(ExceptionUtils.ExceptionStackToString(e));
-		}
-
-		return false;
-	}
-
-	public void InsertOrg(List<Organization> OrgList, String filename) throws SQLException {
-		log.info("Вставляем файл в БД: " + filename);
-		// Тут будем использовать пакетную вставку
-		//		String SQL_INSERT = "INSERT INTO ORGANIZATION (ID, OGRN, KPP, OKTMO, SHORTNAME, FULLNAME, ZIP, URL, POSTALADDRESS, TIMEZONEUTCOFFSET, ORGANIZATIONTYPECODE, ACTUAL, PHONE, EMAIL,FILENAME,REGNUMBER,CONTACTPERSON) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		String SQL_INSERT = "EXECUTE PROCEDURE orginsert (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+	public void InsertOrg(List<Organization> OrgList) throws SQLException {
+		log.info("Вставляем файл в БД файл с организациями ");
+		String SQL_INSERT = "EXECUTE PROCEDURE orginsert (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try {
 			PreparedStatement statement = conn.prepareStatement(SQL_INSERT);
 			long start = System.currentTimeMillis();
 
 			for (int index = 0; index <= OrgList.size() - 1; index++) {
-				// Проверяем нужно ли вставлять
-				//			
-				//				if (!OrgExist(OrgList.get(index).getRegNumber()))
 				{
 					if ((OrgList.get(index).getOrganizationTypeCode() == null)
 							|| (OrgList.get(index).getRegNumber() == null)) {
@@ -94,8 +59,8 @@ public class Database {
 					if (OrgList.get(index).getContactPerson().length() > 150) {
 						log.warning("Поле ContactPerson больше 150 знаков");
 					}
-					if (OrgList.get(index).getRegNumber().length() > 11) {
-						log.warning("Поле RegNumber больше 11 знаков");
+					if (OrgList.get(index).getRegNumber().length() > 20) {
+						log.warning("Поле RegNumber больше 20 знаков");
 					}
 					if (OrgList.get(index).getEmail().length() > 100) {
 						log.warning("Поле Email больше 11 знаков");
@@ -120,9 +85,11 @@ public class Database {
 					statement.setInt(12, OrgList.get(index).isActual());
 					statement.setString(13, OrgList.get(index).getPhone());
 					statement.setString(14, OrgList.get(index).getEmail());
-					statement.setString(15, filename);
+					statement.setString(15, OrgList.get(index).getFileName());
 					statement.setString(16, OrgList.get(index).getRegNumber());
 					statement.setString(17, OrgList.get(index).getContactPerson());
+					statement.setString(18, OrgList.get(index).getIKU());
+					statement.setString(19, OrgList.get(index).getOkved());
 					statement.addBatch();
 
 				}
@@ -156,25 +123,32 @@ public class Database {
 
 	}
 
-	public void InsertZakupki(Zakupka zakupka) throws SQLException {
-		String SQL_INSERT = "INSERT INTO ZAKUPKI (FILENAME,purchaseNumber,OKDP2_CODE,OKPD2_NAME,purchaseObjectInfo, INN, Regnum,HREF,startDate,EndDate,MAXPRICE,PLACINGWAY,responsibleOrg_fullName,PUBLISHDATE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	public void InsertZakupki(Zakupka zakupka) throws SQLException, NullPointerException {
+		String SQL_INSERT = "INSERT INTO ZAKUPKI (FILENAME,purchaseNumber,OKDP2_CODE,OKPD2_NAME,purchaseObjectInfo, INN, Regnum,HREF,startDate,EndDate,MAXPRICE,PLACINGWAY,responsibleOrg_fullName,PUBLISHDATE,zakon,CUSTOMERREGNUM) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try (PreparedStatement statement = conn.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);) {
 			try {
+				if (zakupka.getEmptyZakupka()) {
+					throw new SQLException("Был пустой файл");
+				}
+
 				statement.setString(1, zakupka.getFileName());
 				statement.setString(2, zakupka.getPurchaseNumber());
 				statement.setString(3, "");
 				statement.setString(4, "");
 				statement.setString(5, zakupka.getPurchaseObjectInfo());
 				statement.setString(6, zakupka.getINN());
-				statement.setString(7, zakupka.getRegnum());
-				statement.setString(8, zakupka.getHref());
-				//			statement.setDate(9, (java.sql.Date) zakupka.getStartDate());
+				statement.setDouble(7, 0);
+				// Ссылка не нужна боле, будем ее достраивать в запросе				
+				statement.setString(8, "");
+				//				statement.setString(8, zakupka.getHref());
 				statement.setTimestamp(9, (java.sql.Timestamp) zakupka.getStartDate());
 				statement.setTimestamp(10, (java.sql.Timestamp) zakupka.getEndDate());
 				statement.setDouble(11, zakupka.getMaxPrice());
 				statement.setString(12, zakupka.getPlacingWay());
 				statement.setString(13, zakupka.getResponsibleOrg_fullName());
 				statement.setTimestamp(14, (java.sql.Timestamp) zakupka.getPublishDate());
+				statement.setInt(15, zakupka.getZakon());
+				statement.setString(16, zakupka.getCUSTOMERREGNUM());
 
 				int affectedRows = statement.executeUpdate();
 
@@ -184,7 +158,9 @@ public class Database {
 			} catch (SQLException e) {
 				System.err.println(e.getLocalizedMessage());
 				e.printStackTrace();
-				log.warning(e.getLocalizedMessage() + "\r\n" + SQL_INSERT);
+				log.warning(e.getLocalizedMessage() + "\r\n" + SQL_INSERT + "\r\n PurchaseNumber="
+						+ zakupka.getPurchaseNumber());
+
 				log.warning(ExceptionUtils.ExceptionStackToString(e));
 
 			}
@@ -192,7 +168,6 @@ public class Database {
 			try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					zakupka.setId((generatedKeys.getLong(1)));
-					log.info("KEY=" + zakupka.getId());
 					// Вставляем CUSTOMERREQUIREMENTS
 					InsertCUSTOMERREQUIREMENTS(zakupka);
 					InsertPURCHASEOBJECTS(zakupka);
@@ -225,14 +200,20 @@ public class Database {
 	}
 
 	private void InsertCUSTOMERREQUIREMENTS(Zakupka zakupka) throws SQLException {
-		String SQL_INSERT = "INSERT INTO CUSTOMERREQUIREMENTS (RECORDINDEX,PURCHASECODE) VALUES (?,?)";
+		String SQL_INSERT = "INSERT INTO CUSTOMERREQUIREMENTS (RECORDINDEX, PURCHASECODE, REGNUM) VALUES (?,?,?)";
 		try (PreparedStatement statement = conn.prepareStatement(SQL_INSERT, Statement.NO_GENERATED_KEYS);) {
 
-			List<String> purchasecode1 = zakupka.getPURCHASECODE1();
+			//			List<String> purchasecode1 = zakupka.getCUSTOMERREQUIREMENTS();
+			List<customerRequirement> purchasecode1 = zakupka.getCUSTOMERREQUIREMENTS();
+			if (purchasecode1 == null) {
+				return;
+			}
 			for (int i = 0; i < purchasecode1.size(); i++) {
-				String PURCHASECODE = purchasecode1.get(i);
+				String PURCHASECODE = purchasecode1.get(i).PURCHASECODE;
+				String REGNUM = purchasecode1.get(i).REGNUM;
 				statement.setLong(1, zakupka.getId());
 				statement.setString(2, PURCHASECODE);
+				statement.setString(3, REGNUM);
 
 				int affectedRows = statement.executeUpdate();
 				if (affectedRows == 0) {
@@ -260,12 +241,11 @@ public class Database {
 	 * @throws SQLException
 	 */
 	public String getDatasetString(String strSQL) {
-		//        Statement.KEEP_CURRENT_RESULT;
 		String messageResult = "";
 		ResultSet rs = getDataset(strSQL);
 
 		try {
-			System.out.println("Дата сет закрыт1: " + rs.isClosed());
+			//			System.out.println("Дата сет закрыт1: " + rs.isClosed());
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int nColumnsCount;
 			nColumnsCount = rs.getMetaData().getColumnCount();
@@ -300,7 +280,7 @@ public class Database {
 		return messageResult;
 	}
 
-	private static String HtmlURL(String url) {
+	public static String HtmlURL(String url) {
 		if (url.isEmpty())
 			return url;
 
@@ -342,7 +322,7 @@ public class Database {
 		// SQL запросы.
 		try {
 			Statement stmt = conn.createStatement();
-			System.out.println("База данных открыта: " + conn.isClosed());
+			//			System.out.println("База данных открыта: " + conn.isClosed());
 			// Выполняем SQL запрос.
 			rs = stmt.executeQuery(strSQL);
 
@@ -355,14 +335,12 @@ public class Database {
 
 	public Database(String strDatabasePath) {
 
-		//		String strDatabasePath = "D:\\!Work\\torgovator\\Database\\TORGOVATOR.FDB";
-		//		String strDatabasePath = Params.getDatabaseFDB();
 		log.info("Path to Database " + strDatabasePath);
 		Properties props = new Properties();
 
-		props.setProperty("user", Params.getDatabaseUser());
-		props.setProperty("password", Params.getDatabasePasswd());
-		props.setProperty("encoding", Params.getDatabaseencoding());
+		props.setProperty("user", ParamsWith223FZ.getDatabaseUser());
+		props.setProperty("password", ParamsWith223FZ.getDatabasePasswd());
+		props.setProperty("encoding", ParamsWith223FZ.getDatabaseencoding());
 
 		// По этому URL будет происходить подключение к базе данных.
 		// Обратите внимание: URL содержит путь к базе данных.

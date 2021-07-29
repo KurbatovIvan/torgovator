@@ -32,6 +32,14 @@ public class FileUtils {
 		return success;
 	}
 
+	public static boolean fileExist(String filePathString) {
+		File f = new File(filePathString);
+		if (f.exists() && !f.isDirectory()) {
+			return true;
+		} else
+			return false;
+	}
+
 	public static void RemoveAllFileinDirTo(WorkDir workdir) {
 		if (workdir != null) {
 			RemoveAllFileinDirTo(workdir.getWorkDirOk(), workdir.getWorkDirIn());

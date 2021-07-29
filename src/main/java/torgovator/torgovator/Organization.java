@@ -14,6 +14,7 @@ public class Organization extends Document {
 	private String contactPerson = "";
 	private String Url = "";
 	private String timeZoneUtcOffset = "";
+	private String okved = "";
 
 	@Override
 	public int hashCode() {
@@ -203,7 +204,12 @@ public class Organization extends Document {
 	/** @param postalAddress
 	 *            the postalAddress to set */
 	public void setPostalAddress(String postalAddress) {
-		this.postalAddress = postalAddress;
+		int len = postalAddress.length();
+		if (len > 499) {
+			len = 499;
+		}
+
+		this.postalAddress = postalAddress.substring(0, len);
 	}
 
 	/** @return the url */
@@ -312,6 +318,17 @@ public class Organization extends Document {
 	 *            the IKU to set */
 	public void setIKU(String iKu) {
 		IKU = iKu;
+	}
+
+	/** @return the okved */
+	public String getOkved() {
+		return okved;
+	}
+
+	/** @param okved
+	 *            the okved to set */
+	public void setOkved(String okved) {
+		this.okved = okved;
 	}
 
 }

@@ -1,0 +1,16 @@
+--2019-11-22 11:48:20--  ftp://free:*password*@ftp.zakupki.gov.ru/fcs_regions/Irkutskaja_obl/control99docs/purchaseplans/currMonth/
+           => `.listing'
+Resolving ftp.zakupki.gov.ru... 31.41.245.53
+Connecting to ftp.zakupki.gov.ru|31.41.245.53|:21... connected.
+Logging in as free ... Logged in!
+==> SYST ... done.    ==> PWD ... done.
+==> TYPE I ... done.  ==> CWD /fcs_regions/Irkutskaja_obl/control99docs/purchaseplans/currMonth ... done.
+==> PASV ... done.    ==> LIST ... done.
+
+     0K .......... .......... .......... .......... ..........  104K
+    50K .......... .                                            146K=0,6s
+
+2019-11-22 11:48:22 (110 KB/s) - `.listing' saved [62726]
+
+Removed `.listing'.
+Wrote HTML-ized index to `index.html.1' [150993].

@@ -1,6 +1,5 @@
 torgovator\utils\Zipper.class
 torgovator\torgovator\Organization.class
-torgovator\torgovator\XMLnsiOrganizationList$CustomNode.class
 torgovator\torgovator\Document.class
 torgovator\torgovator\XMLnsiOrganizationList.class
 torgovator\utils\FileUtils.class
@@ -10,11 +9,9 @@ torgovator\utils\EMailService$1.class
 torgovator\torgovator\App.class
 torgovator\utils\ExceptionUtils.class
 torgovator\torgovator\OS.class
+torgovator\torgovator\App$1.class
 torgovator\utils\FTPClientWithList.class
 torgovator\torgovator\Database.class
-torgovator\torgovator\XMLnsiOrganizationList$1.class
-torgovator\torgovator\XmlDocumentZakupka$1.class
-torgovator\torgovator\XmlDocumentZakupka$CustomNode.class
 torgovator\utils\Downloader$Builder.class
 torgovator\torgovator\Zakupka.class
 torgovator\utils\EMailService.class

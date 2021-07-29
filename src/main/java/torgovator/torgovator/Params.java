@@ -15,7 +15,8 @@ public class Params {
 	private static String progname = "torgovator";
 	private static boolean debug;
 	private static boolean sendemail;
-
+	private static boolean overwinget = false;
+	private static String WinGetDir = "";
 	private static String FtpUrl = "";
 	private static String FtpUserName = "";
 	private static String FtpUserPasswd = "";
@@ -52,6 +53,7 @@ public class Params {
 			setFtpUrl(prefs.node(progname).get("UrlFtp", null));
 			setFtpUserName(prefs.node(progname).get("FtpUserName", null));
 			setFtpUserPasswd(prefs.node(progname).get("FtpUserPasswd", null));
+
 			setDatabaseFDB(prefs.node(progname).get("DatabaseFDB", null));
 			setDatabaseFDB_Plan(prefs.node(progname).get("DatabaseFDB_Plan", null));
 			setPatternToExtractRegexp(prefs.node(progname).get("PatternToExtractRegexp", null));
@@ -65,9 +67,12 @@ public class Params {
 			setDatabaseencoding(prefs.node(progname).get("Databaseencoding", null));
 
 			setMailProtocol(prefs.node(progname).get("MailProtocol", null));
+			setOverwinget(Boolean.parseBoolean(prefs.node(progname).get("overwinget", "false")));
 			setMailPort(prefs.node(progname).get("MailPort", null));
 
 			setWorkDirTorgi(DirectoryExist(prefs.node(progname).get("WorkDir", null)));
+
+			setWinGetDir(prefs.node(progname).get("WinGetDir", null));
 
 			setDebug(Boolean.parseBoolean(prefs.node(progname).get("debug", "false")));
 			setSendemail(Boolean.parseBoolean(prefs.node(progname).get("sendemail", "false")));
@@ -97,7 +102,7 @@ public class Params {
 			}
 			setDirToDownload(sneezy.getAll("DirectoryToDownload", String[].class));
 
-			System.out.println("Current OS: " + OS.CURRENT);
+			//			System.out.println("Current OS: " + OS.CURRENT);
 		} catch (IOException E) {
 			log.warning(("IOException (BREAK): " + E.toString()));
 			E.printStackTrace();
@@ -399,6 +404,28 @@ public class Params {
 	 *            the databaseFDB_Plan to set */
 	public static void setDatabaseFDB_Plan(String databaseFDB_Plan) {
 		DatabaseFDB_Plan = databaseFDB_Plan;
+	}
+
+	/** @return the overwinget */
+	public static boolean isOverwinget() {
+		return overwinget;
+	}
+
+	/** @param overwinget
+	 *            the overwinget to set */
+	public static void setOverwinget(boolean overwinget) {
+		Params.overwinget = overwinget;
+	}
+
+	/** @return the winGetDir */
+	public static String getWinGetDir() {
+		return WinGetDir;
+	}
+
+	/** @param winGetDir
+	 *            the winGetDir to set */
+	public static void setWinGetDir(String winGetDir) {
+		WinGetDir = winGetDir;
 	}
 
 }

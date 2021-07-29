@@ -37,16 +37,26 @@ public abstract class Document {
 	}
 
 	public java.sql.Timestamp convertToSqlDateTime(Date utilDate) {
-		return new java.sql.Timestamp(utilDate.getTime());
+		if (utilDate != null) {
+			return new java.sql.Timestamp(utilDate.getTime());
+		} else
+			return null;
 	}
 
 	public java.sql.Timestamp StrToDateSql(String returnValues) {
-		String format = "yyyy-MM-dd'T'HH:mm:ssXXX";
+		// Вот тут теряем в точности малость, возможно надо будет вернуться к этому вопросу		
+		returnValues = returnValues.substring(0, 10);
+		String format = "";
 		if (returnValues.length() == 29) {
 			// Если формат с милисекундами			
 			format = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+		} else if (returnValues.length() == 10) {
+			// Если формат просто дата			
+			format = "yyyy-MM-dd";
+		} else {
+			format = "yyyy-MM-dd'T'HH:mm:ssXXX";
+			format = format.substring(0, returnValues.length() + 2);
 		}
-
 		DateFormat formats = new SimpleDateFormat(format);
 		Date date = null;
 		try {

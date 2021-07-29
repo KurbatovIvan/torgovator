@@ -127,7 +127,7 @@
 <dependency>
     <groupId>org.firebirdsql.jdbc</groupId>
     <artifactId>jaybird-jdk18</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.6</version>
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
@@ -136,6 +136,13 @@
     <artifactId>mail</artifactId>
     <version>1.4.7</version>
 </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.4.4.Final</version>
+        </dependency>
 
 
   </dependencies>
